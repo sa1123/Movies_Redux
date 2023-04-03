@@ -4,6 +4,7 @@ import './index.css';
 import App from './components/App';
 import {createStore, applyMiddleware} from 'redux';
 import rootReducer from './reducers';
+import thunk from 'redux-thunk'
 
 // const logger = function({dispatch, getState}){
 //     return function(next){
@@ -14,10 +15,21 @@ import rootReducer from './reducers';
 // }
 
 const logger = ({ dispatch, getState}) => (next) => (action) => {
+    if(typeof action !== 'function') {
+        console.log("function")
+    }
     next(action);
 }
 
-const store = createStore(rootReducer, applyMiddleware(logger));
+// const thunk = ({dispatch, getState}) => (next) => (action) => {
+//     if(typeof action === 'function'){
+//         action(dispatch);
+//         return;
+//     }
+//     next(action);
+// }
+
+const store = createStore(rootReducer, applyMiddleware(logger, thunk));
 console.log('store', store);
 
 // console.log('before', store.getState());
