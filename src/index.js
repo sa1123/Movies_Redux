@@ -1,12 +1,25 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App';
-import {createStore} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
 import rootReducer from './reducers';
 
-const store = createStore(rootReducer);
+// const logger = function({dispatch, getState}){
+//     return function(next){
+//         return function(action){
+//             next(action)
+//         }
+//     }
+// }
+
+const logger = ({ dispatch, getState}) => (next) => (action) => {
+    next(action);
+}
+
+const store = createStore(rootReducer, applyMiddleware(logger));
 console.log('store', store);
+
 // console.log('before', store.getState());
 
 // store.dispatch({
@@ -16,8 +29,4 @@ console.log('store', store);
 
 // console.log('after', store.getState());
 
-// ReactDOM.render(<App />, document.getElementById('root'));
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-
-root.render(<App />);
+ReactDOM.render(<App store={store} />, document.getElementById('root'));
