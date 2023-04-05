@@ -3,17 +3,12 @@ import {data} from '../data';
 import Navbar from './Navbar';
 import MovieCard from "./MovieCard";
 import { addMovies, setShowFavourites } from "../actions";
+import {StoreContext} from '../index'
 
 class App extends React.Component {
   componentDidMount(){
-    const {store} = this.props;
-    store.subscribe(() => {
-      console.log("Updated");
-      this.forceUpdate();
-    });
-    store.dispatch(addMovies(data));
-
-    console.log(addMovies(data));
+    this.props.store.subscribe(() => this.forceUpdate());
+    this.props.store.dispatch(addMovies(data));
   }
 
   isMovieFavourite = (movie) => {
@@ -23,31 +18,31 @@ class App extends React.Component {
       return true;
     }
     return false;
-  }
+  };
 
-  onChangeTab = (val) => {
+  changeTab = (val) => {
     this.props.store.dispatch(setShowFavourites(val))
   }
 
   render () {
-    const {movies} = this.props.store.getState();
-    const { list, favourites, showFavourites } = movies;
+    const {movies, search} = this.props.store.getState();
+    const { list, favourites = [], showFavourites = []} = movies;
 
     const displayMovies = showFavourites ? favourites : list;
     return (
       <div className="App">
-        <Navbar />
+        <Navbar search={search} />
         <div className="main">
           <div className="tabs">
-            <div className={`tab ${showFavourites ? '' : 'active-tabs'}`} onClick={() => this.onChangeTab(false)}>Movies</div>
-            <div className={`tab ${showFavourites ? 'active-tabs' : ''}`} onClick={() => this.onChangeTab(true)}>Favourites</div>
+            <div className={`tab ${showFavourites ? '' : 'active-tabs'}`} onClick={() => this.changeTab(false)}>Movies</div>
+            <div className={`tab ${showFavourites ? 'active-tabs' : ''}`} onClick={() => this.changeTab(true)}>Favourites</div>
           </div>
 
           <div className="list">
-            {list.map((movie, index) => {
+            {displayMovies.map((movie) => {
               <MovieCard 
                 movie={movie}
-                key={`movies-${index}`}
+                key={movie.imdbID}
                 dispatch={this.props.store.dispatch}
                 isFavourite={this.isMovieFavourite(movie)}/>
                 return null
@@ -60,4 +55,14 @@ class App extends React.Component {
   }
 }
 
-export default App;
+class AppWrapper extends React.Component {
+  render() {
+    return (
+      <StoreContext.Consumer>
+        {(store) => <App store={store} />}
+      </StoreContext.Consumer>
+    );
+  }
+}
+
+export default AppWrapper;
