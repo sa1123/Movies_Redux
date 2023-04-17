@@ -4,15 +4,16 @@ import Navbar from './Navbar';
 import MovieCard from "./MovieCard";
 import { addMovies, setShowFavourites } from "../actions";
 import {StoreContext} from '../index'
+import { connect } from "react-redux";
 
 class App extends React.Component {
   componentDidMount(){
-    this.props.store.subscribe(() => this.forceUpdate());
-    this.props.store.dispatch(addMovies(data));
+    // this.props.store.subscribe(() => this.forceUpdate());
+    this.props.dispatch(addMovies(data));
   }
 
   isMovieFavourite = (movie) => {
-    const {movies} = this.props.store.getState();
+    const {movies} = this.props;
     const index = movies.favourites.indexOf(movie);
     if(index !== -1) {
       return true;
@@ -21,11 +22,11 @@ class App extends React.Component {
   };
 
   changeTab = (val) => {
-    this.props.store.dispatch(setShowFavourites(val))
-  }
+    this.props.dispatch(setShowFavourites(val));
+  };
 
   render () {
-    const {movies, search} = this.props.store.getState();
+    const {movies, search} = this.props;
     const { list, favourites = [], showFavourites = []} = movies;
 
     const displayMovies = showFavourites ? favourites : list;
@@ -43,7 +44,7 @@ class App extends React.Component {
               <MovieCard 
                 movie={movie}
                 key={movie.imdbID}
-                dispatch={this.props.store.dispatch}
+                dispatch={this.props.dispatch}
                 isFavourite={this.isMovieFavourite(movie)}/>
                 return null
             })}
@@ -55,14 +56,22 @@ class App extends React.Component {
   }
 }
 
-class AppWrapper extends React.Component {
-  render() {
-    return (
-      <StoreContext.Consumer>
-        {(store) => <App store={store} />}
-      </StoreContext.Consumer>
-    );
-  }
-}
+// class AppWrapper extends React.Component {
+//   render() {
+//     return (
+//       <StoreContext.Consumer>
+//         {(store) => <App store={store} />}
+//       </StoreContext.Consumer>
+//     );
+//   }
+// }
 
-export default AppWrapper;
+function callback(state){
+  return{
+    movies: state.movies,
+    search: state.movies
+  }
+};
+
+const connectedAppComponent = connect(callback)(App);
+export default connectedAppComponent;

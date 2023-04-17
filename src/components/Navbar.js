@@ -1,5 +1,7 @@
 import React, {Component} from "react";
 import {addMovieToList, handleMovieSearch} from '../actions'
+// import {StoreContext} from '../index'
+import { connect } from 'react-redux';
 
 class Navbar extends Component {
 
@@ -33,7 +35,7 @@ class Navbar extends Component {
                     <input onChange={this.handleChange}/>
                     <button id="search-btn" onClick={this.handleSearch}>Search</button>
 
-                    {showSearchResults &&
+                    {showSearchResults && (
                         <div className="search-results">
                             <div className="search-result">
                                 <img src={movie.Poster} alt='search-pic' />
@@ -44,11 +46,29 @@ class Navbar extends Component {
                                 </div>
                             </div>
                         </div>
-                    }
+                    )}
                 </div>
             </div>
         );
     }
 }
 
-export default Navbar;
+// class NavbarWrapper extends Component {
+//     render() {
+//         return (
+//             <StoreContext.Consumer>
+//                 {(store) => <Navbar dispatch={store.dispatch} search={this.props.search} />}
+//             </StoreContext.Consumer>
+//         )
+//     }
+// }
+
+// export default NavbarWrapper;
+
+function mapStateToProps({ search }) {
+    return {
+      search,
+    };
+  }
+  
+export default connect(mapStateToProps)(Navbar);
